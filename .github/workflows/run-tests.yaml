@@ -1,0 +1,30 @@
+name: Run Tests
+on: [push]
+env:
+  APP_PROTOCOL: http
+  APP_HOST: 127.0.0.1
+  APP_PORT: 8080
+  APP_URL: http://127.0.0.1:8080
+jobs:
+  Run-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jorelali/setup-elm@v5
+        with:
+          elm-version: 0.19.1
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm run build
+      - name: Serve Files
+        uses: Eun/http-server-action@v1
+        with:
+          directory: ${{ github.workspace }}/dist
+          port: ${{ env.APP_PORT }}
+      - name: Wait until site is live
+        uses: smurfpandey/wait-for-it@main
+        with:
+          host: localhost
+          port: ${{ env.APP_PORT }}
+      - run: npm run test
+      - run: echo "🍏 This job's status is ${{ job.status }}."
