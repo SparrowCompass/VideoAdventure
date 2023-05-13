@@ -3,19 +3,26 @@
   "version": "1.0.0",
   "description": "Helps you present videos in a choose-your-own-adventure style",
   "main": "index.js",
+  "config": {
+    "DIST_DIRECTORY": "distro",
+    "SRC_DIRECTORY": "src"
+  },
   "scripts": {
+    "dev": "mkdir -p $npm_package_config_DIST_DIRECTORY && concurrently \"npm:dev:elm\" \"npm:dev:css\" \"npm:build:html\"",
     "test": "concurrently \"npm:test:elm\" \"npm:test:e2e\"",
+    "format": "elm-format $npm_package_config_SRC_DIRECTORY --yes",
+    "build": "mkdir -p $npm_package_config_DIST_DIRECTORY && concurrently \"npm:build:elm\" \"npm:build:css\" \"npm:build:html\"",
     "test:elm": "elm-test",
     "test:e2e": "cypress run",
     "test:e2e:open": "cypress open",
-    "format": "elm-format src --yes",
-    "dev": "cp src/index.html dist/index.html && concurrently \"npm:dev:elm\" \"npm:dev:css\"",
-    "dev:elm": "elm-live src/Main.elm --dir dist -- --output dist/elm.js",
-    "dev:css": "tailwindcss -i ./src/main.css -o ./dist/main.css --watch",
-    "build": "elm make src/Main.elm --optimize --output=dist/elm.js"
+    "dev:elm": "elm-live $npm_package_config_SRC_DIRECTORY/Main.elm --dir $npm_package_config_DIST_DIRECTORY -- --output $npm_package_config_DIST_DIRECTORY/elm.js",
+    "dev:css": "npm run build:css -- --watch",
+    "build:html": "cp $npm_package_config_SRC_DIRECTORY/index.html $npm_package_config_DIST_DIRECTORY/index.html",
+    "build:elm": "elm make $npm_package_config_SRC_DIRECTORY/Main.elm --optimize --output=$npm_package_config_DIST_DIRECTORY/elm.js",
+    "build:css": "tailwindcss -i ./$npm_package_config_SRC_DIRECTORY/main.css -o ./$npm_package_config_DIST_DIRECTORY/main.css"
   },
   "author": "SparrowCompass <christian@sparrowcompass.com>",
-  "license": " GPL-3.0-or-later",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "concurrently": "^8.0.1",
     "tailwindcss": "^3.3.2"
